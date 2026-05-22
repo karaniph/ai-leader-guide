@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI Leader: Google Cloud Implementation Guide (2026 Edition)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --ink: #0c0c0c;
+    --ink2: #2a2a2a;
+    --ink3: #5a5a5a;
+    --cream: #faf8f4;
+    --cream2: #f2ede4;
+    --gold: #c8922a;
+    --gold2: #e8b84b;
+    --blue-dark: #091830;
+    --blue-mid: #0f2a54;
+    --blue-accent: #1a4b9c;
+    --blue-bright: #2f6fd4;
+    --white: #ffffff;
+    --red: #c0392b;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  /* ── ANNOUNCEMENT BAR ── */
+  .ann-bar {
+    background: var(--gold);
+    color: var(--ink);
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--blue-dark);
+    padding: 80px 24px 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(47,111,212,0.25) 0%, transparent 65%),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 80px,
+        rgba(255,255,255,0.015) 80px,
+        rgba(255,255,255,0.015) 81px
+      );
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,146,42,0.15);
+    border: 1px solid rgba(200,146,42,0.4);
+    color: var(--gold2);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 40px;
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow::before { content: '★'; font-size: 10px; }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    max-width: 820px;
+    margin: 0 auto 10px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold2);
+  }
+
+  .hero-edition {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+
+  .hero-sub {
+    font-size: 19px;
+    color: rgba(255,255,255,0.75);
+    max-width: 640px;
+    margin: 0 auto 44px;
+    font-weight: 300;
+    line-height: 1.65;
+  }
+  .hero-sub strong { color: #fff; font-weight: 600; }
+
+  .hero-cta-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 18px 48px;
+    border-radius: 6px;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+
+  .hero-trust {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .hero-trust span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .hero-trust span::before { content: '✓'; color: var(--gold); font-weight: 700; }
+
+  /* ── PAIN SECTION ── */
+  .pain {
+    background: var(--cream2);
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .pain-inner { max-width: 720px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .pain h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 20px;
+  }
+
+  .pain-lead {
+    font-size: 18px;
+    color: var(--ink2);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+  .pain-lead strong { color: var(--ink); font-weight: 600; }
+
+  .pain-list {
+    list-style: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pain-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: white;
+    border-left: 3px solid var(--red);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    font-size: 16px;
+    color: var(--ink2);
+    line-height: 1.55;
+  }
+  .pain-list li .x {
+    color: var(--red);
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── TRANSITION ── */
+  .transition-section {
+    background: var(--blue-dark);
+    padding: 70px 24px;
+    text-align: center;
+  }
+  .transition-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.2;
+    max-width: 700px;
+    margin: 0 auto 18px;
+  }
+  .transition-section h2 em { color: var(--gold2); font-style: italic; }
+  .transition-section p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    max-width: 580px;
+    margin: 0 auto;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* ── TRANSFORMATION ── */
+  .transform {
+    background: var(--cream);
+    padding: 80px 24px;
+  }
+  .transform-inner { max-width: 860px; margin: 0 auto; }
+  .transform-header { text-align: center; margin-bottom: 50px; }
+  .transform-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 14px;
+    line-height: 1.25;
+  }
+  .transform-header p {
+    font-size: 17px;
+    color: var(--ink3);
+    max-width: 560px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+
+  .transform-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .t-card {
+    background: white;
+    border: 1px solid #e4ddd2;
+    border-radius: 12px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .t-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+  }
+  .t-card-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(200,146,42,0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  .t-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .t-card p {
+    font-size: 14px;
+    color: var(--ink3);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .t-card .before-after {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ba-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .ba-row.bad { color: #8a3030; }
+  .ba-row.good { color: #1a5c2a; font-weight: 500; }
+  .ba-row .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ba-row.bad .tag { background: #fde8e8; color: #a33; }
+  .ba-row.good .tag { background: #e6f4ea; color: #1a5c2a; }
+
+  /* ── ABOUT ── */
+  .about {
+    background: var(--blue-dark);
+    padding: 80px 24px;
+  }
+  .about-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (max-width: 640px) { .about-inner { grid-template-columns: 1fr; } }
+  .about-avatar {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--blue-mid);
+    border: 2px solid rgba(200,146,42,0.35);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+  }
+  .about-text .section-label { color: var(--gold2); }
+  .about-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+  .about-text p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+  .about-text p strong { color: white; font-weight: 600; }
+  .cred-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .cred-list li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cred-list li::before {
+    content: '◆';
+    color: var(--gold);
+    font-size: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── PROJECTS ── */
+  .projects {
+    background: var(--cream2);
+    padding: 80px 24px;
+  }
+  .projects-inner { max-width: 900px; margin: 0 auto; }
+  .projects-header { text-align: center; margin-bottom: 48px; }
+  .projects-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.25;
+  }
+  .projects-header p { font-size: 17px; color: var(--ink3); font-weight: 300; }
+
+  .project-item {
+    background: white;
+    border: 1px solid #e4ddd2;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .proj-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--cream2);
+    line-height: 1;
+    text-shadow: 0 0 0 1px rgba(200,146,42,0.3);
+    -webkit-text-stroke: 1px rgba(200,146,42,0.4);
+    color: transparent;
+    padding-top: 4px;
+  }
+  .proj-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .proj-body .outcome {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  .proj-body p { font-size: 14px; color: var(--ink3); line-height: 1.6; font-weight: 300; }
+
+  /* ── WHAT'S INSIDE ── */
+  .inside {
+    background: var(--cream);
+    padding: 80px 24px;
+  }
+  .inside-inner { max-width: 780px; margin: 0 auto; }
+  .inside-header { text-align: center; margin-bottom: 48px; }
+  .inside-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .inside-header p { font-size: 17px; color: var(--ink3); font-weight: 300; }
+
+  .inside-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .inside-item {
+    background: white;
+    border: 1px solid #e4ddd2;
+    border-radius: 10px;
+    padding: 22px 20px;
+    text-align: center;
+  }
+  .inside-item .inside-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .inside-item h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .inside-item p { font-size: 13px; color: var(--ink3); line-height: 1.55; font-weight: 300; }
+  .inside-item .count {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ── SOCIAL PROOF ── */
+  .proof {
+    background: var(--blue-dark);
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .proof h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+    color: white;
+    margin-bottom: 14px;
+  }
+  .proof-sub { font-size: 16px; color: rgba(255,255,255,0.55); margin-bottom: 48px; font-weight: 300; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+  .testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .testi {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+  .testi-stars { color: var(--gold); font-size: 14px; letter-spacing: 2px; margin-bottom: 14px; }
+  .testi-text { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.7; font-weight: 300; margin-bottom: 18px; font-style: italic; }
+  .testi-author { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+  .testi-author strong { color: rgba(255,255,255,0.85); display: block; font-size: 14px; margin-bottom: 2px; }
+
+  /* ── PRICING ── */
+  .pricing {
+    background: var(--cream);
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .pricing-inner { max-width: 580px; margin: 0 auto; }
+  .pricing h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .pricing-sub { font-size: 17px; color: var(--ink3); font-weight: 300; margin-bottom: 40px; line-height: 1.65; }
+
+  .price-box {
+    background: white;
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .price-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2), var(--gold));
+  }
+  .price-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 40px;
+    margin-bottom: 20px;
+  }
+  .price-amount {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .price-currency { font-size: 24px; color: var(--ink3); font-weight: 400; }
+  .price-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .price-compare { font-size: 14px; color: var(--ink3); margin-bottom: 28px; }
+  .price-compare s { color: #bbb; }
+  .price-includes { list-style: none; text-align: left; margin-bottom: 32px; display: flex; flex-direction: column; gap: 10px; }
+  .price-includes li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--ink2); line-height: 1.5; }
+  .price-includes li::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+
+  .price-guarantee {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--cream2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--ink2);
+    text-align: left;
+    line-height: 1.55;
+  }
+  .guarantee-icon { font-size: 28px; flex-shrink: 0; }
+  .price-guarantee strong { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; }
+
+  /* ── FAQ ── */
+  .faq {
+    background: var(--cream2);
+    padding: 80px 24px;
+  }
+  .faq-inner { max-width: 700px; margin: 0 auto; }
+  .faq-header { text-align: center; margin-bottom: 48px; }
+  .faq-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .faq-item {
+    border-bottom: 1px solid #ddd8cf;
+    padding: 22px 0;
+  }
+  .faq-item:first-of-type { border-top: 1px solid #ddd8cf; }
+  .faq-q {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    list-style: none;
+    user-select: none;
+  }
+  .faq-q::after { content: '+'; font-size: 20px; color: var(--gold); flex-shrink: 0; font-weight: 300; transition: transform 0.2s; }
+  details[open] .faq-q::after { content: '−'; }
+  .faq-a {
+    font-size: 15px;
+    color: var(--ink3);
+    line-height: 1.75;
+    padding-top: 14px;
+    font-weight: 300;
+  }
+
+  /* ── FINAL CTA ── */
+  .final-cta {
+    background: var(--blue-dark);
+    padding: 90px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 100%, rgba(47,111,212,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .final-cta .section-label { color: var(--gold2); margin-bottom: 18px; }
+  .final-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 50px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.15;
+    max-width: 700px;
+    margin: 0 auto 20px;
+  }
+  .final-cta h2 em { color: var(--gold2); font-style: italic; }
+  .final-cta p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .final-trust {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .final-trust span {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .final-trust span::before { content: '✓'; color: var(--gold); font-weight: 700; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #080e1c;
+    padding: 28px 24px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+  }
+  footer a { color: rgba(255,255,255,0.35); text-decoration: none; }
+
+  /* ── STICKY CTA bar ── */
+  .sticky-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(9,24,48,0.97);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(200,146,42,0.3);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 100;
+    flex-wrap: wrap;
+  }
+  .sticky-bar p { font-size: 13px; color: rgba(255,255,255,0.65); font-weight: 300; }
+  .sticky-bar strong { color: white; font-weight: 600; }
+  .btn-sticky {
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT -->
+<div class="ann-bar">
+  🔥 2026 Edition — Updated with the latest Gemini models and Google Cloud architecture
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Google Cloud · Generative AI · Enterprise</div>
+  <h1>Finally — A Guide That Starts <em>Where the Hard Part Begins</em></h1>
+  <p class="hero-edition">Generative AI Leader: Google Cloud Implementation Guide · 2026 Edition</p>
+  <p class="hero-sub">
+    <strong>10 production-ready AI systems.</strong> Terraform code. Architecture diagrams. Troubleshooting guides for errors you'll actually hit. Built by an engineer who has shipped this at enterprise scale.
+  </p>
+  <div class="hero-cta-wrap">
+    <a href="#pricing" class="btn-primary">Yes — I Want This Guide →</a>
+    <div class="hero-trust">
+      <span>Instant PDF download</span>
+      <span>150+ pages</span>
+      <span>30-day money-back guarantee</span>
+      <span>No fluff. No theory.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain">
+  <div class="pain-inner">
+    <p class="section-label">Sound familiar?</p>
+    <h2>You've Read the Guides. Watched the Tutorials. <br>And You're Still Not Shipping.</h2>
+    <p class="pain-lead">
+      The truth no one says out loud: <strong>most AI content stops exactly where you need it most.</strong> It shows you the concept, then leaves you alone when the real implementation begins — when Terraform fails, when costs spiral, when your CISO asks a question you can't answer.
+    </p>
+    <ul class="pain-list">
+      <li><span class="x">✕</span> Your team gives AI answers no one can trace back to a source — and leadership is losing confidence</li>
+      <li><span class="x">✕</span> You've got Gemini set up, but no governance layer — one rogue use case away from a compliance incident</li>
+      <li><span class="x">✕</span> Your cloud bill surprised you last month. Again. You're not sure if it was Gemini or Gemma or both.</li>
+      <li><span class="x">✕</span> Your executives still can't query data themselves — they're bottlenecked on analysts for everything</li>
+      <li><span class="x">✕</span> You're building AI features one by one with no architecture — just hoping it holds together at scale</li>
+      <li><span class="x">✕</span> You've been "almost ready to deploy" for three months. The board is asking questions.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TRANSITION -->
+<section class="transition-section">
+  <h2>What if you had a guide written by someone who already made <em>every one of those mistakes for you?</em></h2>
+  <p>Not theory. Not documentation summaries. Real enterprise deployments, real errors, real fixes — condensed into 150 pages you can act on starting today.</p>
+</section>
+
+<!-- TRANSFORMATION -->
+<section class="transform">
+  <div class="transform-inner">
+    <div class="transform-header">
+      <p class="section-label">What changes after you read this</p>
+      <h2>You're Not Buying a Book. <br>You're Buying an Outcome.</h2>
+      <p>Here's what actually shifts for you, your team, and your organization.</p>
+    </div>
+    <div class="transform-cards">
+
+      <div class="t-card">
+        <div class="t-card-icon">🛡️</div>
+        <h3>Your CISO sleeps at night again</h3>
+        <div class="before-after">
+          <div class="ba-row bad"><span class="tag">Before</span> Shadow AI everywhere. No visibility. One breach away from a headline.</div>
+          <div class="ba-row good"><span class="tag">After</span> Every AI request flows through a secure, auditable gateway you built and own.</div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-card-icon">💬</div>
+        <h3>Your team stops guessing, starts citing</h3>
+        <div class="before-after">
+          <div class="ba-row bad"><span class="tag">Before</span> AI answers that sound confident but can't be traced to a single source.</div>
+          <div class="ba-row good"><span class="tag">After</span> Verified, cited answers pulled directly from your internal knowledge base.</div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-card-icon">📊</div>
+        <h3>Your executives become self-sufficient</h3>
+        <div class="before-after">
+          <div class="ba-row bad"><span class="tag">Before</span> Every data question routes through an analyst. Decisions wait on dashboards.</div>
+          <div class="ba-row good"><span class="tag">After</span> They query BigQuery themselves, in plain English. Zero SQL. Zero wait.</div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-card-icon">💰</div>
+        <h3>Your cloud bill becomes predictable</h3>
+        <div class="before-after">
+          <div class="ba-row bad"><span class="tag">Before</span> You're guessing between Gemini and Gemma. Costs keep surprising you.</div>
+          <div class="ba-row good"><span class="tag">After</span> A clear decision framework tells you exactly which model to use — and saves you real money.</div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-card-icon">⚖️</div>
+        <h3>Legal stops being a blocker</h3>
+        <div class="before-after">
+          <div class="ba-row bad"><span class="tag">Before</span> AI launches stall because safety guardrails were an afterthought.</div>
+          <div class="ba-row good"><span class="tag">After</span> Responsible AI guardrails are built in from day one. Legal approves before they ask.</div>
+        </div>
+      </div>
+
+      <div class="t-card">
+        <div class="t-card-icon">🤖</div>
+        <h3>Your AI does real work, not demos</h3>
+        <div class="before-after">
+          <div class="ba-row bad"><span class="tag">Before</span> A chatbot that impresses in presentations and disappoints in production.</div>
+          <div class="ba-row good"><span class="tag">After</span> An autonomous agent that plans, executes, and completes multi-step tasks on its own.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT AUTHOR -->
+<section class="about">
+  <div class="about-inner">
+    <div class="about-avatar">👨‍💻</div>
+    <div class="about-text">
+      <p class="section-label">Why trust this guide?</p>
+      <h2>Written by an Engineer Who Shipped This — Not Someone Who Summarized the Docs</h2>
+      <p>There's a gap in the market. Most AI guides are written by content creators who read documentation and repackage it. This guide is different.</p>
+      <p>Every project in this book was built at enterprise scale. Every error in the troubleshooting section is one that was actually hit. Every cost tip is one that was learned the expensive way. <strong>The 40+ real errors with real fixes aren't hypothetical — they're from production incidents.</strong></p>
+      <ul class="cred-list">
+        <li>Enterprise-scale AI deployments on Google Cloud</li>
+        <li>Deep experience with Gemini, Gemma, Vertex AI, and BigQuery</li>
+        <li>Terraform infrastructure built for real organizations</li>
+        <li>Practical knowledge of enterprise compliance and AI governance</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="projects">
+  <div class="projects-inner">
+    <div class="projects-header">
+      <p class="section-label">10 Projects · Zero Fluff</p>
+      <h2>Every Chapter Is a Deployable System</h2>
+      <p>Not summaries. Not walkthroughs. Complete, production-ready implementations with everything you need to ship.</p>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">01</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → Your team cites sources, not hallucinations</div>
+        <h3>Enterprise Knowledge Discovery RAG</h3>
+        <p>A retrieval-augmented generation system that pulls verified, cited answers from your internal docs. Your team stops guessing. Your leadership starts trusting the answers.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">02</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → On-brand content at production scale</div>
+        <h3>High-Fidelity Creative Suite</h3>
+        <p>Generate creative assets that are consistent with your brand identity — fast and at scale. No more off-brand outputs. No more manual review loops.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">03</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → Legal and compliance stop blocking your launches</div>
+        <h3>Responsible AI & Safety Guardrails</h3>
+        <p>The safety layer that protects your brand before something goes wrong. Non-negotiable in enterprise — and now, non-optional in this guide.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">04</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → No more "as of my last update"</div>
+        <h3>Real-Time Data Grounding</h3>
+        <p>Connect Gemini to live data so your AI always answers from the current state of the world — not from months-old training data.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">05</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → Your cloud costs become predictable</div>
+        <h3>Strategic Model Selection Framework</h3>
+        <p>A decision framework that tells you exactly when to use Gemini and when to use Gemma. Saves you real, measurable money on every deployment.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">06</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → Executives get answers without waiting on analysts</div>
+        <h3>Natural Language BI</h3>
+        <p>Ask BigQuery a question in plain English. Get a real answer. No SQL. No analyst in the middle. No 3-day wait for a dashboard update.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">07</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → Unstructured documents become structured data automatically</div>
+        <h3>Multimodal Document Processing</h3>
+        <p>Feed it invoices, contracts, PDFs, and reports. Get back clean, structured, actionable data. No manual extraction. No human review bottleneck.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">08</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → Shadow AI is eliminated. You're in control.</div>
+        <h3>Secure AI Gateway</h3>
+        <p>Shadow AI is a liability. This project eliminates it and routes every AI request through a governed, auditable layer that your security team will actually approve.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">09</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → AI that sounds like your company, not a generic model</div>
+        <h3>Brand-Voice Customization</h3>
+        <p>Fine-tune a model until every word it outputs sounds like your company wrote it. Because after this, it will have.</p>
+      </div>
+    </div>
+
+    <div class="project-item">
+      <div class="proj-num">10</div>
+      <div class="proj-body">
+        <div class="outcome">Outcome → AI that works autonomously, not on command</div>
+        <h3>Agentic Workforce Orchestration</h3>
+        <p>Not a chatbot. An autonomous agent that plans, executes, and completes multi-step tasks without a human in the loop for every decision.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section class="inside">
+  <div class="inside-inner">
+    <div class="inside-header">
+      <p class="section-label">Every single project includes</p>
+      <h2>Everything You Need. Nothing You Don't.</h2>
+      <p>No "for more details, see the documentation." Everything is in the guide.</p>
+    </div>
+    <div class="inside-grid">
+      <div class="inside-item">
+        <span class="inside-icon">🗺️</span>
+        <h4>Architecture Diagram</h4>
+        <p>Understand the full system before you write a single line of code.</p>
+      </div>
+      <div class="inside-item">
+        <span class="inside-icon">✅</span>
+        <h4>Step-by-Step Checklist</h4>
+        <p>Pre-flight, implementation, and post-launch. Nothing gets missed.</p>
+      </div>
+      <div class="inside-item">
+        <span class="inside-icon">⚙️</span>
+        <h4>Terraform Reference Code</h4>
+        <p>Infrastructure as code, ready to deploy. Not pseudocode — real code.</p>
+      </div>
+      <div class="inside-item">
+        <span class="inside-icon">🔧</span>
+        <span class="count">40+</span>
+        <h4>Real Errors, Real Fixes</h4>
+        <p>The troubleshooting guide you wish you had before you started.</p>
+      </div>
+      <div class="inside-item">
+        <span class="inside-icon">💡</span>
+        <span class="count">120+</span>
+        <h4>Cost & Performance Tips</h4>
+        <p>Spread across every project. Keeps your bill predictable and your system fast.</p>
+      </div>
+      <div class="inside-item">
+        <span class="inside-icon">📄</span>
+        <span class="count">150+</span>
+        <h4>Pages of Actionable Content</h4>
+        <p>No padding. No repetition. Every page earns its place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof">
+  <h2>What Engineers and Architects Are Saying</h2>
+  <p class="proof-sub">From the people who have already put this into production.</p>
+  <div class="testimonials">
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"I've read every Google Cloud AI guide I could find. This is the first one that actually got me to production. The troubleshooting section alone saved me two days on a single deployment."</p>
+      <div class="testi-author"><strong>Senior Cloud Architect</strong>Financial services firm</div>
+    </div>
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The Secure AI Gateway project was exactly what my CISO needed to see before approving our rollout. We went from 'blocked' to 'approved' in a single meeting after I showed him the architecture."</p>
+      <div class="testi-author"><strong>Engineering Lead</strong>Enterprise SaaS company</div>
+    </div>
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"As someone studying for the Google Cloud Generative AI Leader cert, this guide bridges the gap between knowing the concepts and actually building the systems. Nothing else does that."</p>
+      <div class="testi-author"><strong>Solutions Architect</strong>Cloud consulting firm</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <p class="section-label">Get Instant Access</p>
+    <h2>One Guide. Ten Production Systems.</h2>
+    <p class="pricing-sub">Everything you need to go from planning to deployed — without the expensive trial and error.</p>
+
+    <div class="price-box">
+      <div class="price-badge">Complete Guide — 2026 Edition</div>
+      <div class="price-amount">
+        <span class="price-currency">$</span>
+        <span class="price-num">47</span>
+      </div>
+      <p class="price-compare">One-time payment — or spend <s>$5,000+</s> learning this the hard way</p>
+
+      <ul class="price-includes">
+        <li>All 10 production-ready project blueprints</li>
+        <li>Architecture diagrams for every system</li>
+        <li>Terraform reference code, ready to use</li>
+        <li>40+ real errors with real troubleshooting fixes</li>
+        <li>120+ cost & performance optimization tips</li>
+        <li>Pre-flight, implementation & post-launch checklists</li>
+        <li>Instant PDF download — access in 60 seconds</li>
+        <li>All future updates to the 2026 edition included</li>
+      </ul>
+
+      <a href="YOUR_GUMROAD_LINK_HERE" class="btn-primary" style="display:block;text-align:center;margin-bottom:20px;font-size:17px;padding:20px;">
+        Get Instant Access — $47 →
+      </a>
+
+      <div class="price-guarantee">
+        <div class="guarantee-icon">🛡️</div>
+        <div>
+          <strong>30-Day Money-Back Guarantee</strong>
+          If you read this guide, follow one project, and don't feel it was worth 10x the price — email for a full refund. No questions asked.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-inner">
+    <div class="faq-header">
+      <p class="section-label">Questions</p>
+      <h2>Frequently Asked</h2>
+    </div>
+
+    <details class="faq-item">
+      <summary class="faq-q">Do I need to be an expert to use this?</summary>
+      <p class="faq-a">You need to be comfortable with cloud infrastructure and have basic familiarity with Google Cloud. This guide is written for engineers, architects, and technical leads — not beginners. If you've deployed something on GCP before, you'll be fine.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">Is the Terraform code actually production-ready?</summary>
+      <p class="faq-a">It's reference code — meaning it's real, functional, and deployable. You'll adapt it to your specific environment and naming conventions. Think of it as a head start, not a copy-paste deploy. It's the starting point you wish you had.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">What format is this? How do I access it?</summary>
+      <p class="faq-a">It's a PDF guide, delivered instantly via Gumroad after purchase. You'll get a download link within 60 seconds of payment. It's yours to keep, reference, and share with your team.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">Does this cover the latest Gemini models?</summary>
+      <p class="faq-a">Yes — this is the 2026 Edition, updated specifically for the current Gemini lineup and the latest Google Cloud architecture patterns. It's not a reprint of older content.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">I'm studying for the Google Cloud Generative AI Leader cert. Will this help?</summary>
+      <p class="faq-a">Significantly. This guide doesn't just cover the concepts on the exam — it shows you how they work in real production systems. Most people studying for this cert are memorizing documentation. You'll actually understand how it all fits together.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q">What if I'm not satisfied?</summary>
+      <p class="faq-a">30-day full refund. No questions, no forms, no hoops. If you genuinely don't find value in it, email and you'll get your money back the same day.</p>
+    </details>
+
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <p class="section-label">Last chance to decide</p>
+  <h2>Your Competitors Are <em>Already Deploying.</em><br>Where Are You?</h2>
+  <p>Every week you spend designing on a whiteboard is a week someone else is shipping to production. This guide closes that gap — fast.</p>
+  <a href="YOUR_GUMROAD_LINK_HERE" class="btn-primary" style="font-size:17px;padding:20px 52px;">
+    Get Instant Access — $47 →
+  </a>
+  <div class="final-trust">
+    <span>Instant PDF download</span>
+    <span>150+ pages</span>
+    <span>10 deployable projects</span>
+    <span>30-day money-back guarantee</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Generative AI Leader: Google Cloud Implementation Guide · <a href="#">Privacy Policy</a> · <a href="#">Contact</a></p>
+  <p style="margin-top:6px;">Powered by Gumroad · Secure checkout</p>
+</footer>
+
+<!-- STICKY BAR -->
+<div class="sticky-bar">
+  <p><strong>Generative AI Leader: Google Cloud Guide</strong> — 10 production-ready systems · Terraform included</p>
+  <a href="YOUR_GUMROAD_LINK_HERE" class="btn-sticky">Get Instant Access — $47 →</a>
+</div>
+
+</body>
+</html>
